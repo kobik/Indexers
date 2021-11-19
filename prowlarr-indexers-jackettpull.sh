@@ -169,14 +169,14 @@ for pick_commit in ${commit_range}; do
             if [[ $trace = true ]]; then
                 read -ep $"Reached - JS Conflict Remove ; Pausing for debugging - Press any key to continue or [Ctrl-C] to abort.\n" -n1 -s
             fi
-            git rm --f "*.js"
+            git rm --f --q "*.js"
         fi
         if [[ -n $html_conflicts ]]; then
             echo "html conflicts exist; removing *.html*"
             if [[ $trace = true ]]; then
                 read -ep $"Reached - HTML Conflict Remove ; Pausing for debugging - Press any key to continue or [Ctrl-C] to abort.\n" -n1 -s
             fi
-            git rm --f "*.html"
+            git rm --f --q "*.html"
         fi
         if [[ -n $readme_conflicts ]]; then
             echo "README conflict exists; using Prowlarr README"
@@ -190,13 +190,15 @@ for pick_commit in ${commit_range}; do
             echo "YML conflict exists; [$yml_conflicts]"
             # handle removals first
             yml_remove=$(git status | grep yml | grep -v "definitions/" | awk -F ': ' '{print $2}' | awk '{ gsub(/^[ \t]+|[ \t]+$/, ""); print }')
-            echo "Removing non-definition yml; [$yml_remove]"
-            if [[ $debug = true ]]; then
-                read -ep $"Reached - YML Conflict Remove ; Pausing for debugging - Press any key to continue or [Ctrl-C] to abort.\n" -n1 -s
-            fi
-            git rm --f "$yml_remove" ## remove non-definition yml
-            # check if we are still conflicted after removals
-            yml_conflicts=$(git diff --cached --name-only | grep ".yml")
+            for def in $yml_remove; do
+                echo "Removing non-definition yml; [$yml_remove]"
+                if [[ $debug = true ]]; then
+                    read -ep $"Reached - YML Conflict Remove ; Pausing for debugging - Press any key to continue or [Ctrl-C] to abort.\n" -n1 -s
+                fi
+                git rm --f --ignore-unmatch "$yml_remove" ## remove non-definition yml
+                # check if we are still conflicted after removals
+                yml_conflicts=$(git diff --cached --name-only | grep ".yml")
+            done
             if [[ -n $yml_conflicts ]]; then
                 yml_defs=$(git status | grep yml | grep "definitions/")
                 yml_add=$(echo "$yml_defs" | grep -v "deleted by them" | awk -F ': ' '{print $2}' | awk '{ gsub(/^[ \t]+|[ \t]+$/, ""); print }')
