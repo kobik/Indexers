@@ -414,7 +414,7 @@ if [ $pulls_exists = true ]; then
                 if [[ $debug = true ]]; then
                     read -ep $"Pausing for debugging - Press any key to continue or [Ctrl-C] to abort.\n" -n1 -s
                 fi
-                git push origin [$jackett_pulls_branch] --force-if-includes --force-with-lease
+                git push origin $jackett_pulls_branch --force-if-includes --force-with-lease
                 echo "Branch Force Pushed"
                 exit 0
                 ;;
@@ -422,7 +422,7 @@ if [ $pulls_exists = true ]; then
                 if [[ $debug = true ]]; then
                     read -ep $"Pausing for debugging - Press any key to continue or [Ctrl-C] to abort.\n" -n1 -s
                 fi
-                git push origin [$jackett_pulls_branch] --force-if-includes --force-with-lease --set-upstream
+                git push origin $jackett_pulls_branch --force-if-includes --force-with-lease --set-upstream
                 echo "Branch Pushed"
                 exit 0
                 ;;
